@@ -5,22 +5,24 @@ import { User } from '@prisma/client';
 export class TokensProvider {
   constructor(private readonly jwtService: JwtService) {}
 
-  public signToken<T>({
-    userId,
+  private signToken<T>({
+    sub,
     expiresIn,
+    secret,
     payload,
   }: {
-    userId: number;
+    sub: number;
     expiresIn: string;
+    secret: string;
     payload: T;
   }) {
     return this.jwtService.signAsync(
       {
-        id: userId,
+        id: sub,
         ...payload,
       },
       {
-        secret: '123',
+        secret: secret,
         expiresIn,
       },
     );
@@ -28,14 +30,28 @@ export class TokensProvider {
 
   public async generateTokens(user: User) {
     const [accessToken, refreshToken] = await Promise.all([
-      this.signToken({ userId: user.id, expiresIn: '1h', payload: user }),
       this.signToken({
-        userId: user.id,
+        sub: user.id,
+        expiresIn: '1h',
+        secret: process.env.accessSecret,
+        payload: user,
+      }),
+      this.signToken({
+        sub: user.id,
         expiresIn: '7d',
-        payload: { userId: user.id },
+        secret: process.env.refreshSecret,
+
+        payload: { sub: user.id },
       }),
     ]);
 
     return { accessToken, refreshToken };
+  }
+
+  public async verifyToken(token: string) {
+    const result = this.jwtService.verify(token, {
+      secret: process.env.secret,
+    });
+    return result;
   }
 }

@@ -6,8 +6,10 @@ import { SignUpProvider } from './providers/signup.provider';
 import { SignInProvider } from './providers/signin.provider';
 import { CheckUserProvider } from './providers/checkUserExists.provider';
 import { HashingProvider } from './providers/hashing.provider';
-import { TokensProvider } from './providers/tokenProvider';
+import { TokensProvider } from './providers/tokensProvider';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtStrategy } from './stratiges/jwt.strategy';
+import { RefreshTokenProvider } from './providers/refresh';
 
 @Module({
   controllers: [AuthController],
@@ -20,13 +22,10 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
     HashingProvider,
     TokensProvider,
     JwtService,
+    JwtStrategy,
+    RefreshTokenProvider,
   ],
-  imports: [
-    JwtModule.register({
-      secret: 'secretKey', // You can move this to a config service later
-      signOptions: { expiresIn: '1h' },
-    }),
-  ],
+  imports: [JwtModule],
   exports: [JwtService, AuthService],
 })
 export class AuthModule {}

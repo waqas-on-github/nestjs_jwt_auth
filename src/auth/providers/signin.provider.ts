@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SignInDto } from '../dto/signin.dto';
 import { CheckUserProvider } from './checkUserExists.provider';
 import { HashingProvider } from './hashing.provider';
-import { TokensProvider } from './tokenProvider';
+import { TokensProvider } from './tokensProvider';
 
 @Injectable()
 export class SignInProvider {
